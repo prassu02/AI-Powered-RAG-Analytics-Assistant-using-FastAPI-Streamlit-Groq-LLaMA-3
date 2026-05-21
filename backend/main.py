@@ -1,8 +1,8 @@
 from fastapi import FastAPI, UploadFile
 import os
 
-from backend.utils import load_file, split_text
-from backend.rag_pipeline import ingest, ask_question
+from utils import load_file, split_text
+from rag_pipeline import ask_question
 
 app = FastAPI()
 
