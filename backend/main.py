@@ -2,7 +2,8 @@ from fastapi import FastAPI, UploadFile
 import os
 
 from utils import load_file, split_text
-from rag_pipeline import ask_question, ingest 
+from rag_pipeline import ask_question
+from rag_pipeline import ingest   # IMPORTANT add this if missing
 
 app = FastAPI()
 
