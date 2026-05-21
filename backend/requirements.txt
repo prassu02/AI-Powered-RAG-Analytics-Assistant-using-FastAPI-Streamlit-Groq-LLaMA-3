@@ -1,9 +1,10 @@
 fastapi
 uvicorn
-streamlit
+python-multipart
 sentence-transformers
 faiss-cpu
 numpy
 pandas
-pypdf
-requests
+openai
+groq
+python-dotenv
