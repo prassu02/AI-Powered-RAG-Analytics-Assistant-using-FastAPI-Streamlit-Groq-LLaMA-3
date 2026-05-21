@@ -5,6 +5,5 @@ sentence-transformers
 faiss-cpu
 numpy
 pandas
-openai
-groq
 python-dotenv
+groq
