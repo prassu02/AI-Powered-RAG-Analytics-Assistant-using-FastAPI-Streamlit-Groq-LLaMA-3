@@ -10,5 +10,6 @@ pandas==2.2.3
 numpy==1.26.4
 scikit-learn==1.5.2
 python-multipart==0.0.12
-langchain
-langchain-text-splitters
+
+langchain==0.2.16
+langchain-text-splitters==0.2.4
