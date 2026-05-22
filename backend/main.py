@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import os
 
 from backend.utils import load_file, split_text
@@ -35,53 +36,85 @@ UPLOAD_DIR = "data/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # -----------------------------------
-# Health Check
+# Request Model
 # -----------------------------------
 
-@app.get("/")
+class QueryRequest(BaseModel):
+    question: str
+
+# -----------------------------------
+# Home Endpoint
+# -----------------------------------
+
+@app.get("/", tags=["Home"])
 def home():
     return {
-        "message": "RAG Analytics Assistant API Running"
+        "message": "RAG Analytics Assistant API Running Successfully"
+    }
+
+# -----------------------------------
+# Health Check Endpoint
+# -----------------------------------
+
+@app.get("/health", tags=["Health"])
+def health():
+    return {
+        "status": "healthy"
     }
 
 # -----------------------------------
 # Upload Endpoint
 # -----------------------------------
 
-@app.post("/upload")
+@app.post("/upload", tags=["Document Processing"])
 async def upload_file(file: UploadFile = File(...)):
 
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    try:
+        # Save uploaded file
+        file_path = os.path.join(UPLOAD_DIR, file.filename)
 
-    with open(file_path, "wb") as f:
-        f.write(await file.read())
+        with open(file_path, "wb") as f:
+            f.write(await file.read())
 
-    # Load document text
-    text = load_file(file_path)
+        # Load document text
+        text = load_file(file_path)
 
-    # Split into chunks
-    chunks = split_text(text)
+        # Split into chunks
+        chunks = split_text(text)
 
-    # Store embeddings
-    ingest(chunks)
+        # Store embeddings
+        ingest(chunks)
 
-    return {
-        "status": "success",
-        "filename": file.filename,
-        "chunks": len(chunks),
-        "message": "File uploaded and processed successfully"
-    }
+        return {
+            "status": "success",
+            "filename": file.filename,
+            "chunks": len(chunks),
+            "message": "File uploaded and processed successfully"
+        }
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
 
 # -----------------------------------
 # Query Endpoint
 # -----------------------------------
 
-@app.post("/query")
-def query(q: str):
+@app.post("/query", tags=["RAG Q&A"])
+def query(request: QueryRequest):
 
-    answer = ask_question(q)
+    try:
+        answer = ask_question(request.question)
 
-    return {
-        "question": q,
-        "answer": answer
-    }
+        return {
+            "question": request.question,
+            "answer": answer
+        }
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
