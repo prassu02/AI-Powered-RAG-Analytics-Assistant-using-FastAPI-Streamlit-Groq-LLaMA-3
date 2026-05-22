@@ -1,7 +1,10 @@
 import streamlit as st
 import requests
 
-# ================= PAGE CONFIG (MUST BE FIRST) =================
+# ================= BACKEND URL =================
+API_URL = "https://ai-powered-rag-analytics-assistant-04r8.onrender.com"
+
+# ================= PAGE CONFIG =================
 st.set_page_config(page_title="RAG Assistant", layout="wide")
 
 # ================= CSS =================
@@ -26,35 +29,60 @@ st.markdown(
 )
 
 # ================= TITLE =================
-st.title("📊 RAG- AI Analytics Assistant ")
+st.title("📊 RAG AI Analytics Assistant")
 
-# ---------------- Upload Section ----------------
-file = st.file_uploader("Upload file (PDF/CSV/TXT)")
+# ================= UPLOAD SECTION =================
+st.header("📁 Upload Document")
 
-if file:
-    files = {"file": (file.name, file.getvalue())}
-    res = requests.post("http://127.0.0.1:8000/upload", files=files)
+file = st.file_uploader("Upload PDF / TXT / CSV")
 
-    if res.status_code == 200:
-        st.success(res.json()["message"])
-    else:
-        st.error("Upload failed")
+if file is not None:
+    if st.button("Upload to Backend"):
 
-# ---------------- Query Section ----------------
-query = st.text_input("Ask your analytics question")
+        with st.spinner("Uploading and processing..."):
+            files = {"file": (file.name, file.getvalue())}
+
+            try:
+                res = requests.post(f"{API_URL}/upload", files=files)
+
+                if res.status_code == 200:
+                    data = res.json()
+
+                    if "error" in data:
+                        st.error(data["error"])
+                    else:
+                        st.success(f"Uploaded successfully! Chunks: {data.get('chunks', 0)}")
+
+                else:
+                    st.error(f"Upload failed: {res.text}")
+
+            except Exception as e:
+                st.error(f"Error: {str(e)}")
+
+# ================= QUERY SECTION =================
+st.header("💬 Ask Questions")
+
+query = st.text_input("Enter your question about the document")
 
 if st.button("Get Answer"):
 
     if not query:
         st.warning("Please enter a question")
     else:
-        res = requests.post(
-            "http://127.0.0.1:8000/query",
-            params={"q": query}
-        )
+        with st.spinner("Thinking..."):
 
-        data = res.json()
-        answer = data.get("answer", "No response received")
+            try:
+                res = requests.post(
+                    f"{API_URL}/ask",
+                    json={"question": query}
+                )
 
-        st.subheader("🤖 AI Answer")
-        st.markdown(answer)
+                if res.status_code == 200:
+                    data = res.json()
+                    st.subheader("🤖 AI Answer")
+                    st.write(data.get("answer", "No answer returned"))
+                else:
+                    st.error(f"Error: {res.text}")
+
+            except Exception as e:
+                st.error(f"Request failed: {str(e)}")
