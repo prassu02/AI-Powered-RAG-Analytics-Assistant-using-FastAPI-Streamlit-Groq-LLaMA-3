@@ -48,16 +48,18 @@ class QueryRequest(BaseModel):
 
 @app.get("/", tags=["Home"])
 def home():
+
     return {
         "message": "RAG Analytics Assistant API Running Successfully"
     }
 
 # -----------------------------------
-# Health Check Endpoint
+# Health Endpoint
 # -----------------------------------
 
 @app.get("/health", tags=["Health"])
 def health():
+
     return {
         "status": "healthy"
     }
@@ -70,24 +72,37 @@ def health():
 async def upload_file(file: UploadFile = File(...)):
 
     try:
+
+        # Validate file
+        if not file.filename.endswith(".pdf"):
+            raise HTTPException(
+                status_code=400,
+                detail="Only PDF files are supported"
+            )
+
         # Save uploaded file
         file_path = os.path.join(UPLOAD_DIR, file.filename)
 
         with open(file_path, "wb") as f:
             f.write(await file.read())
 
-        # Load document text
+        # Extract text
         text = load_file(file_path)
 
-        # Validate extracted text
-        if not text or text.strip() == "":
+        if not text:
             raise HTTPException(
                 status_code=400,
                 detail="No readable text found in uploaded file"
             )
 
-        # Split into chunks
+        # Split text into chunks
         chunks = split_text(text)
+
+        if len(chunks) == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Text chunking failed"
+            )
 
         # Store embeddings
         ingest(chunks)
@@ -99,8 +114,8 @@ async def upload_file(file: UploadFile = File(...)):
             "message": "File uploaded and processed successfully"
         }
 
-    except HTTPException as http_error:
-        raise http_error
+    except HTTPException as e:
+        raise e
 
     except Exception as e:
         raise HTTPException(
@@ -116,6 +131,13 @@ async def upload_file(file: UploadFile = File(...)):
 def query(request: QueryRequest):
 
     try:
+
+        if not request.question.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Question cannot be empty"
+            )
+
         answer = ask_question(request.question)
 
         return {
@@ -123,17 +145,11 @@ def query(request: QueryRequest):
             "answer": answer
         }
 
+    except HTTPException as e:
+        raise e
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
             detail=str(e)
         )
-
-# -----------------------------------
-# Run Locally
-# -----------------------------------
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)
