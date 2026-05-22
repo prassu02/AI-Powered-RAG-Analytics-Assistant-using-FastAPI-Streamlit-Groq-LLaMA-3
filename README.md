@@ -1,18 +1,20 @@
-# 📊 RAG-Based Analytics Assistant
+ # 📊 RAG-Based Analytics Assistant
 
-An **End-to-End Retrieval-Augmented Generation (RAG) system** that allows users to upload documents (PDF, CSV, TXT) and ask intelligent questions using a combination of **vector search (embeddings)** and **Large Language Models (Groq LLM)**.
+An **End-to-End Retrieval-Augmented Generation (RAG) system** that enables users to upload documents (PDF, CSV, TXT) and interact with them using **AI-powered semantic search + Groq LLM (LLaMA 3)**.
+
+It combines **vector embeddings, similarity search, and LLM reasoning** to deliver intelligent, context-aware responses.
 
 ---
 
-## 🚀 Live Features
+## 🚀 Live Demo
 
-* 📄 Upload documents (PDF / CSV / TXT)
-* 🧠 AI-powered question answering
-* 🔍 Semantic search using embeddings
-* 📊 Context-aware analytics responses
-* ⚡ Fast inference using Groq LLM (LLaMA 3)
-* 🌐 REST API with FastAPI backend
-* 🎨 Interactive Streamlit UI
+### 🔹 Backend API (Render)
+
+👉 [https://ai-powered-rag-analytics-assistant-04r8.onrender.com](https://ai-powered-rag-analytics-assistant-04r8.onrender.com)
+
+### 🔹 Frontend (Streamlit Cloud)
+
+👉 [https://dwyzqnkno3wfpaptskstjg.streamlit.app/](https://dwyzqnkno3wfpaptskstjg.streamlit.app/)
 
 ---
 
@@ -21,21 +23,21 @@ An **End-to-End Retrieval-Augmented Generation (RAG) system** that allows users 
 ```
 User (Streamlit UI)
         ↓
-FastAPI Backend
+FastAPI Backend (Render)
         ↓
-Document Processing (PDF/CSV/TXT)
+Document Upload & Processing
         ↓
 Text Chunking
         ↓
 Embedding Model (Sentence Transformers)
         ↓
-Vector Database (FAISS-like store)
+Vector Store (FAISS-like)
         ↓
-Similarity Search
+Semantic Similarity Search
         ↓
 Groq LLM (LLaMA 3)
         ↓
-Final Answer Returned to UI
+AI Response to UI
 ```
 
 ---
@@ -46,23 +48,27 @@ Final Answer Returned to UI
 rag-analytics-assistant/
 │
 ├── backend/
-│   ├── main.py              # FastAPI server
-│   ├── rag_pipeline.py      # RAG logic (ingestion + QA)
-│   ├── vectorstore.py      # Vector database (FAISS-like)
-│   ├── embedder.py         # Embedding model
-│   ├── utils.py            # Helper functions
+│   ├── __init__.py
+│   ├── config.py
+│   ├── embedder.py
+│   ├── main.py
+│   ├── ragpipeline.py
+│   ├── utils.py
+│   ├── vectorstore.py
+│   ├── requirements.txt
 │
 ├── frontend/
-│   ├── streamlit_app.py    # Streamlit UI
+│   ├── __init__.py
+│   ├── streamlit_app.py
+│   ├── requirements.txt
 │
-├── data/
-│   ├── uploads/            # Uploaded documents
+├── uploads/
 │
-├── vectorstore/
-│   ├── faiss_index/        # Stored embeddings
-│
-├── requirements.txt
+├── venv/
+├── .env
+├── .gitignore
 ├── Dockerfile
+├── render.yaml
 └── README.md
 ```
 
@@ -73,14 +79,14 @@ rag-analytics-assistant/
 ### 🔹 Backend
 
 * FastAPI
-* Python 3.10+
 * Uvicorn
+* Python 3.10+
 
 ### 🔹 AI / ML
 
 * SentenceTransformers (Embeddings)
-* Groq API (LLaMA 3.3 / 70B)
-* RAG (Retrieval Augmented Generation)
+* Groq API (LLaMA 3)
+* Retrieval-Augmented Generation (RAG)
 
 ### 🔹 Vector Database
 
@@ -107,7 +113,7 @@ cd rag-analytics-assistant
 
 ```bash
 python -m venv venv
-source venv/bin/activate   # Linux/Mac
+source venv/bin/activate   # Mac/Linux
 venv\Scripts\activate      # Windows
 ```
 
@@ -116,14 +122,15 @@ venv\Scripts\activate      # Windows
 ### 3️⃣ Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
+pip install -r frontend/requirements.txt
 ```
 
 ---
 
-### 4️⃣ Set Environment Variables
+### 4️⃣ Setup Environment Variables
 
-Create a `.env` file:
+Create `.env` file:
 
 ```env
 GROQ_API_KEY=your_groq_api_key_here
@@ -131,7 +138,7 @@ GROQ_API_KEY=your_groq_api_key_here
 
 ---
 
-## 🚀 Run the Project
+## 🚀 Run Locally
 
 ### ▶️ Start Backend (FastAPI)
 
@@ -139,7 +146,7 @@ GROQ_API_KEY=your_groq_api_key_here
 uvicorn backend.main:app --reload
 ```
 
-Backend runs at:
+Backend:
 
 ```
 http://127.0.0.1:8000
@@ -153,7 +160,7 @@ http://127.0.0.1:8000
 streamlit run frontend/streamlit_app.py
 ```
 
-Frontend runs at:
+Frontend:
 
 ```
 http://localhost:8501
@@ -163,23 +170,19 @@ http://localhost:8501
 
 ## 📡 API Endpoints
 
-### 🔹 Upload File
+### 🔹 Upload Document
 
 ```
 POST /upload
 ```
 
-**Body:** file (PDF/CSV/TXT)
-
----
-
-### 🔹 Ask Question
+### 🔹 Query Document
 
 ```
 POST /query?q=your_question
 ```
 
-**Response:**
+### 🔹 Response Format
 
 ```json
 {
@@ -191,15 +194,15 @@ POST /query?q=your_question
 
 ## 🧪 Example Use Cases
 
-* Explain ML concepts (Overfitting, Bias-Variance)
-* Summarize uploaded PDFs
-* Data analytics Q&A
-* Document-based chat assistant
-* Knowledge retrieval system
+* 📄 PDF summarization
+* 📊 Data analytics Q&A
+* 🧠 Machine learning concept explanation
+* 🔍 Semantic document search
+* 💬 AI-powered knowledge assistant
 
 ---
 
-## 💡 Key Features Explained
+## 💡 Key Features
 
 ### 🔹 RAG Pipeline
 
@@ -208,33 +211,21 @@ Combines:
 * Document retrieval (Vector Search)
 * Generative AI (Groq LLM)
 
-### 🔹 Embedding Model
+### 🔹 Embeddings
 
-Converts text → vector representations for semantic search.
+Converts text into dense vector representations for semantic search.
 
 ### 🔹 Vector Store
 
-Stores embeddings for fast similarity search.
+Efficient similarity search over document embeddings.
+
+### 🔹 Fast Inference
+
+Powered by **Groq LLaMA 3 API** for ultra-fast responses.
 
 ---
 
-## 📊 Example Query
-
-**User:**
-
-> What is Overfitting?
-
-**AI Response:**
-
-* Definition
-* Explanation
-* Real-world analogy
-* Example
-* Solution (regularization, cross-validation)
-
----
-
-## 🐳 Docker Support (Optional)
+## 🐳 Docker Support
 
 ```bash
 docker build -t rag-assistant .
@@ -243,14 +234,32 @@ docker run -p 8000:8000 rag-assistant
 
 ---
 
+## ☁️ Deployment
+
+### 🔹 Backend (Render)
+
+* Service: FastAPI
+* Auto Deploy: GitHub Integration
+* Live URL:
+  👉 [https://ai-powered-rag-analytics-assistant-04r8.onrender.com](https://ai-powered-rag-analytics-assistant-04r8.onrender.com)
+
+### 🔹 Frontend (Streamlit Cloud)
+
+* Hosted on Streamlit Community Cloud
+* Live URL:
+  👉 [https://dwyzqnkno3wfpaptskstjg.streamlit.app/](https://dwyzqnkno3wfpaptskstjg.streamlit.app/)
+
+---
+
 ## 📈 Future Improvements
 
-* 🔥 Chat memory (multi-turn conversation)
-* 🔥 Streaming responses (ChatGPT-like typing)
-* 🔥 Reranking (BGE / Cohere)
-* 🔥 Multi-document RAG
-* 🔥 AWS deployment (EC2 + S3)
-* 🔥 Authentication system
+* 🔥 Multi-turn conversation memory
+* 🔥 Streaming responses (ChatGPT-like UI)
+* 🔥 Advanced reranking (BGE / Cohere rerankers)
+* 🔥 Multi-document RAG fusion
+* 🔥 AWS deployment (EC2 + S3 + Lambda)
+* 🔥 User authentication system
+* 🔥 Chat history database (MongoDB / PostgreSQL)
 
 ---
 
@@ -265,6 +274,8 @@ Specialized in Machine Learning, Deep Learning, and RAG Systems
 ## ⭐ Project Highlights
 
 ✔ End-to-end RAG system
+✔ Production-ready architecture
+✔ Deployed backend + frontend
 ✔ Real-world AI assistant
-✔ Production-style architecture
-✔ Portfolio-ready ML project
+✔ Portfolio-ready ML engineering project
+
