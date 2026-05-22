@@ -1,9 +1,12 @@
 fastapi
 uvicorn
-python-multipart
+streamlit
 sentence-transformers
 faiss-cpu
-numpy
-pandas
-python-dotenv
 groq
+python-dotenv
+pypdf
+pandas
+numpy
+scikit-learn
+python-multipart
