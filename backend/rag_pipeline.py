@@ -8,46 +8,59 @@ from groq import Groq
 # Load environment variables
 load_dotenv()
 
-# Vector DB (global)
+# Initialize vector database
 vector_db = VectorStore()
 
-# API key
+# Load API key
 api_key = os.getenv("GROQ_API_KEY")
 
 if not api_key:
     raise ValueError("GROQ_API_KEY not found in .env file")
 
-# Groq client
+# Initialize Groq client
 client = Groq(api_key=api_key)
 
 
 def ingest(text_chunks):
-    """Store embeddings into FAISS"""
+    """
+    Store embeddings into FAISS vector database
+    """
+
+    if not text_chunks:
+        raise ValueError("No text chunks provided")
+
     embeddings = model.encode(text_chunks)
+
     vector_db.add(embeddings, text_chunks)
 
 
 def ask_question(question):
-    """RAG pipeline: retrieve + generate"""
+    """
+    RAG pipeline:
+    1. Embed question
+    2. Retrieve similar chunks
+    3. Generate answer using Groq LLM
+    """
 
     try:
-        # Step 1: Embed query
+
+        # Generate query embedding
         query_embedding = model.encode([question])[0]
 
-        # Step 2: Retrieve similar chunks
+        # Retrieve relevant documents
         docs = vector_db.search(query_embedding)
 
-        # Safety check
         if not docs:
             return "No relevant context found in uploaded documents."
 
-        context = "\n".join(docs)
+        # Combine retrieved chunks
+        context = "\n\n".join(docs)
 
-        # Step 3: Prompt engineering (important for ML interviews)
+        # Prompt template
         prompt = f"""
-You are a senior data science and AI analytics expert.
+You are a senior AI, Data Science, and Analytics expert.
 
-Use ONLY the context below to answer the question.
+Answer the question ONLY using the provided context.
 
 Context:
 {context}
@@ -56,13 +69,13 @@ Question:
 {question}
 
 Instructions:
-- Give clear explanation
+- Give a clear explanation
 - Use simple language
-- Add examples if helpful
-- Focus on insights, not raw text
+- Add examples if useful
+- Focus on insights and analytics
 """
 
-        # Step 4: Groq LLM call
+        # Groq LLM call
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
@@ -82,4 +95,5 @@ Instructions:
         return response.choices[0].message.content
 
     except Exception as e:
+
         return f"Error occurred in RAG pipeline: {str(e)}"
