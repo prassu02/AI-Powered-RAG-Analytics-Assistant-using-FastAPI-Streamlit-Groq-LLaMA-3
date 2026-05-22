@@ -1,22 +1,31 @@
 from pypdf import PdfReader
-import pandas as pd
 
 def load_file(file_path):
+
+    text = ""
+
+    # PDF Files
     if file_path.endswith(".pdf"):
+
         reader = PdfReader(file_path)
-        return "\n".join([p.extract_text() for p in reader.pages])
 
-    elif file_path.endswith(".csv"):
-        df = pd.read_csv(file_path)
-        return df.to_string()
+        for page in reader.pages:
 
-    else:
+            page_text = page.extract_text()
+
+            if page_text:
+                text += page_text + "\n"
+
+    # TXT Files
+    elif file_path.endswith(".txt"):
+
         with open(file_path, "r", encoding="utf-8") as f:
-            return f.read()
+            text = f.read()
 
+    # CSV Files
+    elif file_path.endswith(".csv"):
 
-def split_text(text, chunk_size=500):
-    chunks = []
-    for i in range(0, len(text), chunk_size):
-        chunks.append(text[i:i+chunk_size])
-    return chunks
+        with open(file_path, "r", encoding="utf-8") as f:
+            text = f.read()
+
+    return text
