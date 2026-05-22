@@ -1,5 +1,9 @@
 from pypdf import PdfReader
 
+# -----------------------------------
+# Load File
+# -----------------------------------
+
 def load_file(file_path):
 
     text = ""
@@ -29,3 +33,16 @@ def load_file(file_path):
             text = f.read()
 
     return text
+
+# -----------------------------------
+# Split Text into Chunks
+# -----------------------------------
+
+def split_text(text, chunk_size=500):
+
+    chunks = []
+
+    for i in range(0, len(text), chunk_size):
+        chunks.append(text[i:i + chunk_size])
+
+    return chunks
