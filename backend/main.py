@@ -1,80 +1,42 @@
 from fastapi import FastAPI, UploadFile, File
-from fastapi.middleware.cors import CORSMiddleware
-import os
-
 from backend.utils import load_file, split_text
-from backend.embeddings import get_embeddings
-from backend.vectorstore import VectorStore
+from backend.ragpipeline import ingest
 
-app = FastAPI(title="AI Powered RAG Analytics Assistant")
-
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Upload folder
-UPLOAD_DIR = "uploads"
-
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-# Initialize vector store
-vectorstore = VectorStore()
+app = FastAPI()
 
 
 @app.get("/")
 def home():
-
-    return {
-        "message": "RAG Analytics Assistant Running Successfully"
-    }
+    return {"message": "AI Powered RAG Analytics Assistant Running"}
 
 
 @app.post("/upload")
 async def upload(file: UploadFile = File(...)):
 
     try:
-
-        file_path = os.path.join(
-            UPLOAD_DIR,
-            file.filename
-        )
+        # Save uploaded file
+        file_path = f"temp_{file.filename}"
 
         with open(file_path, "wb") as f:
+            f.write(await file.read())
 
-            content = await file.read()
-
-            f.write(content)
-
-        # Load document
+        # Extract text
         text = load_file(file_path)
 
+        # Check empty text
         if not text.strip():
-
-            return {
-                "error": "No text extracted from document"
-            }
+            return {"error": "No text extracted from document"}
 
         # Split into chunks
         chunks = split_text(text)
 
-        # Generate embeddings
-        embeddings = get_embeddings(chunks)
-
-        # Store vectors
-        vectorstore.add(embeddings, chunks)
+        # Store in vector DB
+        ingest(chunks)
 
         return {
-            "message": "File uploaded successfully",
+            "message": "Document uploaded successfully",
             "chunks": len(chunks)
         }
 
     except Exception as e:
-
-        return {
-            "detail": str(e)
-        }
+        return {"error": str(e)}
