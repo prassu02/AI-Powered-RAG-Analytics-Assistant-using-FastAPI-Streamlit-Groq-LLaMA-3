@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
@@ -93,10 +93,10 @@ async def upload_file(file: UploadFile = File(...)):
         }
 
     except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e)
-        }
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 # -----------------------------------
 # Query Endpoint
@@ -114,7 +114,16 @@ def query(request: QueryRequest):
         }
 
     except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e)
-        }
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+# -----------------------------------
+# Run Locally
+# -----------------------------------
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)
