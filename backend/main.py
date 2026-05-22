@@ -79,6 +79,13 @@ async def upload_file(file: UploadFile = File(...)):
         # Load document text
         text = load_file(file_path)
 
+        # Validate extracted text
+        if not text or text.strip() == "":
+            raise HTTPException(
+                status_code=400,
+                detail="No readable text found in uploaded file"
+            )
+
         # Split into chunks
         chunks = split_text(text)
 
@@ -91,6 +98,9 @@ async def upload_file(file: UploadFile = File(...)):
             "chunks": len(chunks),
             "message": "File uploaded and processed successfully"
         }
+
+    except HTTPException as http_error:
+        raise http_error
 
     except Exception as e:
         raise HTTPException(
