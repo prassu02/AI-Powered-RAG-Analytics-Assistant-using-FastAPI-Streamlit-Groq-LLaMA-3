@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+streamlit
+sentence-transformers
+faiss-cpu
+groq
+python-dotenv
+pypdf
+pandas
+numpy
+scikit-learn
+python-multipart
