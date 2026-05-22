@@ -11,5 +11,7 @@ numpy==1.26.4
 scikit-learn==1.5.2
 python-multipart==0.0.12
 torch==2.2.2+cpu
-
+pdf2image
+pytesseract
+Pillow
 --extra-index-url https://download.pytorch.org/whl/cpu
