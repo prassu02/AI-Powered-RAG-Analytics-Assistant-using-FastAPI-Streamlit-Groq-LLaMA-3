@@ -1,6 +1,6 @@
-__pycache__/
-*.pyc
-*.pyo
 venv/
+__pycache__/
 .env
-vectorstore/faiss_index/
+*.pyc
+data/uploads/*
+vectorstore/faiss_index/*
