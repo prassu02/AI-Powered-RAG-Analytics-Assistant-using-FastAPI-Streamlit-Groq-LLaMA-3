@@ -1,7 +1,6 @@
 from pypdf import PdfReader
-from pdf2image import convert_from_path
-import pytesseract
-import os
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
 
 # -----------------------------------
 # Load PDF File
@@ -12,59 +11,34 @@ def load_file(file_path):
     text = ""
 
     try:
+        reader = PdfReader(file_path)
 
-        # -----------------------------------
-        # Try Normal PDF Extraction
-        # -----------------------------------
-
-        pdf = PdfReader(file_path)
-
-        for page in pdf.pages:
-
+        for page in reader.pages:
             page_text = page.extract_text()
 
             if page_text:
                 text += page_text + "\n"
 
-        # -----------------------------------
-        # If No Text -> Use OCR
-        # -----------------------------------
-
-        if not text.strip():
-
-            images = convert_from_path(file_path)
-
-            for image in images:
-
-                ocr_text = pytesseract.image_to_string(image)
-
-                if ocr_text:
-                    text += ocr_text + "\n"
-
-        return text.strip()
-
     except Exception as e:
+        raise Exception(f"Error reading PDF: {str(e)}")
 
-        print(f"PDF Reading Error: {e}")
+    return text.strip()
 
-        return ""
 
 # -----------------------------------
 # Split Text into Chunks
 # -----------------------------------
 
-def split_text(text, chunk_size=500):
+def split_text(text):
 
-    if not text:
+    if not text or len(text.strip()) == 0:
         return []
 
-    chunks = []
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=500,
+        chunk_overlap=50
+    )
 
-    for i in range(0, len(text), chunk_size):
-
-        chunk = text[i:i + chunk_size]
-
-        if chunk.strip():
-            chunks.append(chunk)
+    chunks = splitter.split_text(text)
 
     return chunks
