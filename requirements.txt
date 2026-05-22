@@ -1,13 +1,13 @@
-fastapi
-uvicorn
-sentence-transformers
-faiss-cpu
-groq
-python-dotenv
-pypdf
-pandas
-numpy
-scikit-learn
-python-multipart
+fastapi==0.115.0
+uvicorn==0.30.6
+sentence-transformers==2.7.0
+faiss-cpu==1.8.0
+groq==0.11.0
+python-dotenv==1.0.1
+pypdf==5.0.1
+pandas==2.2.3
+numpy==1.26.4
+scikit-learn==1.5.2
+python-multipart==0.0.12
 torch==2.2.2+cpu
 --extra-index-url https://download.pytorch.org/whl/cpu
